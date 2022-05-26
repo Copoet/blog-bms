@@ -50,7 +50,7 @@ export default class Login extends Vue {
     return (
       <div class="login-wrap">
         <div class="login-content">
-          <h2 class="login-title">博客后台管理系统</h2>
+          <h2 class="login-title">嘉合监测站</h2>
           <el-form onSubmit={this.submit}>
             <el-form-item class="input-item" label="用户名">
               <el-input

@@ -1,39 +1,22 @@
 <template>
   <div class="main-wrap" v-loading="loading">
-    <el-input
-      v-model.trim="search.keyword"
-      placeholder="输入用户名"
-      class="marginr20"
-    ></el-input>
-    <el-button
-      type="primary"
-      size="medium"
-      icon="el-icon-search"
-      @click.prevent="getUserList"
-    >
+    <el-input v-model.trim="search.keyword" placeholder="输入用户名" class="marginr20"></el-input>
+    <el-button type="primary" size="medium" icon="el-icon-search" @click.prevent="getUserList">
       搜索
     </el-button>
-    <el-button
-      type="primary"
-      size="medium"
-      icon="el-icon-plus"
-      @click.prevent="addUser"
-    >
+    <el-button type="primary" size="medium" icon="el-icon-plus" @click.prevent="addUser">
       新增用户
     </el-button>
     <el-table :data="tableData" border style="width: 100%;margin-top: 20px;">
-      <el-table-column fixed prop="id" label="uid" width="150">
+      <el-table-column fixed prop="id" label="ID" width="150">
       </el-table-column>
       <el-table-column prop="name" label="昵称"></el-table-column>
       <el-table-column prop="create_time" label="创建时间"></el-table-column>
       <el-table-column prop="up_ip" label="登录ip地址"></el-table-column>
       <el-table-column label="状态">
         <template slot-scope="{ row }">
-          <el-tag
-            :type="row.status == '启用' ? 'success' : 'warning'"
-            disable-transitions
-          >
-            {{ row.status }}
+          <el-tag :type="row.status_str == '启用' ? 'success' : 'warning'" disable-transitions>
+            {{ row.status_str }}
           </el-tag>
         </template>
       </el-table-column>
@@ -48,21 +31,9 @@
         </template>
       </el-table-column>
     </el-table>
-    <el-pagination
-      v-if="total > pageNum"
-      background
-      layout="prev, pager, next"
-      :page-size.sync="pageNum"
-      @current-change="handleCurrentChange"
-      :total="total"
-      class="margint20 text-right"
-    ></el-pagination>
-    <el-drawer
-      title="新增用户"
-      :visible.sync="showUserPopup"
-      :direction="'rtl'"
-      :before-close="handleClose"
-    >
+    <el-pagination v-if="total > pageNum" background layout="prev, pager, next" :page-size.sync="pageNum"
+      @current-change="handleCurrentChange" :total="total" class="margint20 text-right"></el-pagination>
+    <el-drawer title="新增用户" :visible.sync="showUserPopup" :direction="'rtl'" :before-close="handleClose">
       <div class="demo-drawer__content padding20">
         <el-form :model="addForm" :label-position="'right'" label-width="80px">
           <el-form-item label="用户名" class="add-item">
@@ -72,29 +43,20 @@
             <el-input v-model="addForm.password" autocomplete="off"></el-input>
           </el-form-item>
           <el-form-item label="状态" class="add-item">
-            <el-select v-model="addForm.status" placeholder="请选择用户状态">
+            <el-select v-model="addForm.status_str" placeholder="请选择用户状态">
               <el-option label="启用" value="1"></el-option>
               <el-option label="禁用" value="2"></el-option>
             </el-select>
           </el-form-item>
         </el-form>
         <div class="demo-drawer__footer">
-          <el-button
-            type="primary"
-            class="paddingh20"
-            @click="addManager"
-            :loading="loading"
-            >{{ loading ? "提交中 ..." : "确 定" }}</el-button
-          >
+          <el-button type="primary" class="paddingh20" @click="addManager" :loading="loading">{{ loading ? "提交中 ..." :
+              "确 定"
+          }}</el-button>
         </div>
       </div>
     </el-drawer>
-    <el-dialog
-      title="编辑用户"
-      :visible.sync="dialogVisible"
-      width="40%"
-      :before-close="handleClose"
-    >
+    <el-dialog title="编辑用户" :visible.sync="dialogVisible" width="40%" :before-close="handleClose">
       <div class="demo-drawer__content padding20">
         <el-form :model="editForm" :label-position="'right'" label-width="80px">
           <el-form-item label="用户名" class="add-item">
@@ -104,7 +66,7 @@
             <el-input v-model="editForm.password" autocomplete="off"></el-input>
           </el-form-item> -->
           <el-form-item label="状态" class="add-item">
-            <el-select v-model="editForm.status" placeholder="请选择用户状态">
+            <el-select v-model="editForm.status_str" placeholder="请选择用户状态">
               <el-option label="启用" value="1"></el-option>
               <el-option label="禁用" value="2"></el-option>
             </el-select>
@@ -112,13 +74,9 @@
         </el-form>
         <div class="demo-drawer__footer">
           <el-button @click="dialogVisible = false">取 消</el-button>
-          <el-button
-            type="primary"
-            class="paddingh20"
-            @click="editManager"
-            :loading="loading"
-            >{{ loading ? "提交中 ..." : "确 定" }}</el-button
-          >
+          <el-button type="primary" class="paddingh20" @click="editManager" :loading="loading">{{ loading ? "提交中 ..." :
+              "确 定"
+          }}</el-button>
         </div>
       </div>
     </el-dialog>
@@ -138,7 +96,7 @@ export default class User extends Vue {
   loading = false;
   showUserPopup = false;
   dialogVisible = false;
-  pageNum = 2;
+  pageNum = 10;
   search: Parms = {
     page: 1, // 当前页数
     // eslint-disable-next-line @typescript-eslint/camelcase
@@ -187,7 +145,7 @@ export default class User extends Vue {
     this.loading = true;
     const param = new FormData();
     param.append("name", this.addForm.name);
-    param.append("pass_word", this.addForm.password);
+    param.append("password", this.addForm.password);
     param.append("status", this.addForm.status);
     addManager(param)
       .then(() => {
@@ -224,7 +182,8 @@ export default class User extends Vue {
     const status: any = this.editForm.status == "启用" ? 1 : 2;
     param.append("name", this.editForm.name);
     param.append("status", status);
-    editManager(this.editForm.id, param)
+    param.append("id",this.editForm.id)
+    editManager(param)
       .then(() => {
         this.loading = false;
         this.initEdit();
@@ -265,7 +224,7 @@ export default class User extends Vue {
 }
 </script>
 <style>
-.el-drawer__header > :first-child:focus {
+.el-drawer__header> :first-child:focus {
   outline: none;
 }
 </style>
@@ -273,13 +232,16 @@ export default class User extends Vue {
 .el-input {
   width: auto;
 }
+
 .add-btn {
   padding: 10px 30px;
   margin-left: 80px;
 }
+
 .demo-drawer__footer {
   margin-left: 80px;
 }
+
 .add-item {
   .el-input {
     width: 80%;

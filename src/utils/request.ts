@@ -7,7 +7,7 @@ const hasError = (res: any) => {
   return Number(res.code) === 2000;
 };
 
-const baseUrl = "http://test.aiproclub.com";
+const baseUrl = "http://www.vision.com";
 
 let loading: any;
 // let closeLoading = false;
@@ -30,10 +30,6 @@ service.interceptors.request.use(
       Object.assign(config.headers, {
         "Content-Type": "application/json"
       });
-      // if (config.method === "post") {
-      //   // config.data = qs.stringify(config.data);
-      //   // config.data = qs.stringify(config.data);
-      // }
     }
     loading = Loading.service({
       lock: true,

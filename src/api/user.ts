@@ -32,9 +32,9 @@ export const addManager = (data?: any) => {
   });
 };
 
-export const editManager = (id: any, data?: any) => {
+export const editManager = (data?: any) => {
   return request({
-    url: `/api/manager/update/${id}`,
+    url: `/api/manager/update`,
     method: "post",
     data
   });
@@ -43,7 +43,7 @@ export const editManager = (id: any, data?: any) => {
 export const deleteManager = (id: any, data?: any) => {
   return request({
     url: `/api/manager/delete/${id}`,
-    method: "post",
+    method: "delete",
     data
   });
 };
